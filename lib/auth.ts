@@ -6,6 +6,10 @@ import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  // Vercel auto-trusts its own host; self-hosted deployments (e.g. behind a
+  // bare EC2 IP with no reverse-proxy TLS) need this explicitly, or Auth.js
+  // rejects every request with "UntrustedHost".
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
