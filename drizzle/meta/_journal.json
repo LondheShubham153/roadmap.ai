@@ -8,6 +8,13 @@
       "when": 1788945578030,
       "tag": "0000_pink_wendell_vaughn",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1788946644958,
+      "tag": "0001_cold_captain_stacy",
+      "breakpoints": true
     }
   ]
 }

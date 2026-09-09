@@ -1,7 +1,24 @@
 import "dotenv/config";
 import { hash } from "bcryptjs";
 import { db } from "./client";
-import { users, subjects, topics } from "./schema";
+import { users, subjects, topics, resources } from "./schema";
+
+type CareerLevel = "fresher" | "intermediate" | "expert";
+
+function twsResourcesFor(topicTitle: string) {
+  return [
+    {
+      title: `${topicTitle} on TrainWithShubham (YouTube)`,
+      url: `https://www.youtube.com/@TrainWithShubham/search?query=${encodeURIComponent(topicTitle)}`,
+      type: "video" as const,
+    },
+    {
+      title: "TrainWithShubham.com",
+      url: "https://www.trainwithshubham.com",
+      type: "doc" as const,
+    },
+  ];
+}
 
 async function main() {
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@roadmap.ai";
@@ -41,32 +58,40 @@ async function main() {
     })
     .returning();
 
-  const devopsMilestones = [
-    { title: "Linux", description: "Shell, filesystem, permissions, processes." },
-    { title: "Networking", description: "TCP/IP, DNS, HTTP, load balancing basics." },
-    { title: "Git", description: "Version control workflows and collaboration." },
-    { title: "Docker", description: "Containers, images, Dockerfiles, Compose." },
-    { title: "Jenkins", description: "CI/CD pipelines and automation." },
-    { title: "Kubernetes", description: "Container orchestration at scale." },
-    { title: "Terraform", description: "Infrastructure as code." },
+  const devopsMilestones: { title: string; description: string; careerLevel: CareerLevel }[] = [
+    { title: "Linux", description: "Shell, filesystem, permissions, processes.", careerLevel: "fresher" },
+    { title: "Networking", description: "TCP/IP, DNS, HTTP, load balancing basics.", careerLevel: "fresher" },
+    { title: "Git", description: "Version control workflows and collaboration.", careerLevel: "fresher" },
+    { title: "Docker", description: "Containers, images, Dockerfiles, Compose.", careerLevel: "intermediate" },
+    { title: "Jenkins", description: "CI/CD pipelines and automation.", careerLevel: "intermediate" },
+    { title: "Kubernetes", description: "Container orchestration at scale.", careerLevel: "expert" },
+    { title: "Terraform", description: "Infrastructure as code.", careerLevel: "expert" },
   ];
 
   for (const [i, m] of devopsMilestones.entries()) {
-    await db.insert(topics).values({
-      subjectId: devops.id,
-      title: m.title,
-      description: m.description,
-      level: "milestone",
-      order: i,
-    });
+    const [topic] = await db
+      .insert(topics)
+      .values({
+        subjectId: devops.id,
+        title: m.title,
+        description: m.description,
+        level: "milestone",
+        careerLevel: m.careerLevel,
+        order: i,
+      })
+      .returning();
+
+    for (const [j, r] of twsResourcesFor(m.title).entries()) {
+      await db.insert(resources).values({ topicId: topic.id, order: j, ...r });
+    }
   }
 
-  const cloudMilestones = [
-    { title: "AWS Fundamentals", description: "IAM, regions, and the shared responsibility model." },
-    { title: "EC2", description: "Virtual machines, AMIs, auto scaling." },
-    { title: "RDS", description: "Managed relational databases." },
-    { title: "S3", description: "Object storage and static hosting." },
-    { title: "VPC", description: "Networking, subnets, security groups." },
+  const cloudMilestones: { title: string; description: string; careerLevel: CareerLevel }[] = [
+    { title: "AWS Fundamentals", description: "IAM, regions, and the shared responsibility model.", careerLevel: "fresher" },
+    { title: "EC2", description: "Virtual machines, AMIs, auto scaling.", careerLevel: "fresher" },
+    { title: "RDS", description: "Managed relational databases.", careerLevel: "intermediate" },
+    { title: "S3", description: "Object storage and static hosting.", careerLevel: "intermediate" },
+    { title: "VPC", description: "Networking, subnets, security groups.", careerLevel: "expert" },
   ];
 
   for (const [i, m] of cloudMilestones.entries()) {
@@ -75,6 +100,7 @@ async function main() {
       title: m.title,
       description: m.description,
       level: "milestone",
+      careerLevel: m.careerLevel,
       order: i,
     });
   }

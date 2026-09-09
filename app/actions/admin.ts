@@ -42,6 +42,10 @@ export async function createTopic(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const level = String(formData.get("level") ?? "milestone") as "milestone" | "topic" | "subtopic";
+  const careerLevel = String(formData.get("careerLevel") ?? "fresher") as
+    | "fresher"
+    | "intermediate"
+    | "expert";
   const parentTopicId = formData.get("parentTopicId") ? String(formData.get("parentTopicId")) : null;
   if (!title) throw new Error("Title is required");
 
@@ -52,6 +56,7 @@ export async function createTopic(formData: FormData) {
     title,
     description,
     level,
+    careerLevel,
     parentTopicId,
     order: existing.length,
   });

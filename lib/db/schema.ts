@@ -39,6 +39,9 @@ export const topics = sqliteTable("topics", {
   level: text("level", { enum: ["milestone", "topic", "subtopic"] })
     .notNull()
     .default("topic"),
+  careerLevel: text("career_level", { enum: ["fresher", "intermediate", "expert"] })
+    .notNull()
+    .default("fresher"),
   order: integer("order").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()

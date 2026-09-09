@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -39,7 +40,7 @@ export default async function ManageSubjectPage({ params }: { params: Promise<{ 
 
           <form action={createTopic} className="mt-8 grid gap-3 rounded-3xl border border-border bg-card p-6">
             <input type="hidden" name="subjectId" value={subject.id} />
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
               <div className="space-y-1.5">
                 <Label htmlFor="title">Title</Label>
                 <Input id="title" name="title" placeholder="e.g. Docker" required />
@@ -54,6 +55,19 @@ export default async function ManageSubjectPage({ params }: { params: Promise<{ 
                     <SelectItem value="milestone">Milestone</SelectItem>
                     <SelectItem value="topic">Topic</SelectItem>
                     <SelectItem value="subtopic">Subtopic</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="careerLevel">Required for</Label>
+                <Select name="careerLevel" defaultValue="fresher">
+                  <SelectTrigger id="careerLevel" className="w-36">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fresher">Fresher</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="expert">Expert</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -86,7 +100,12 @@ export default async function ManageSubjectPage({ params }: { params: Promise<{ 
             {milestones.map((m) => (
               <div key={m.id} className="rounded-2xl border border-border bg-card p-4">
                 <div className="flex items-center justify-between">
-                  <p className="font-heading font-semibold">{m.title}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-heading font-semibold">{m.title}</p>
+                    <Badge variant="outline" className="font-normal capitalize">
+                      {m.careerLevel}
+                    </Badge>
+                  </div>
                   <form action={deleteTopic.bind(null, m.id, subject.id)}>
                     <Button variant="ghost" size="icon" type="submit">
                       <Trash2 className="size-4 text-destructive" />

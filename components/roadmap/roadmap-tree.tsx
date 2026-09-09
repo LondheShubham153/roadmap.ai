@@ -1,9 +1,17 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { Check, Circle, ExternalLink } from "lucide-react";
+import { Check, Circle, ExternalLink, Info, PlayCircle, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export type ResourceItem = { id: string; title: string; url: string; type: string };
 export type TopicNode = {
@@ -44,6 +52,7 @@ export function RoadmapTree({
 
   const [completed, setCompleted] = useState(new Set(completedIds));
   const [, startTransition] = useTransition();
+  const [activeTopic, setActiveTopic] = useState<TopicNode | null>(null);
 
   const toggle = (id: string) => {
     const isDone = completed.has(id);
@@ -72,10 +81,49 @@ export function RoadmapTree({
               completed={completed}
               interactive={interactive}
               onToggle={toggle}
+              onShowInfo={setActiveTopic}
             />
           </li>
         ))}
       </ol>
+
+      <Dialog open={!!activeTopic} onOpenChange={(open) => !open && setActiveTopic(null)}>
+        <DialogContent>
+          {activeTopic && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-heading">{activeTopic.title}</DialogTitle>
+                {activeTopic.description && (
+                  <DialogDescription>{activeTopic.description}</DialogDescription>
+                )}
+              </DialogHeader>
+
+              <div className="mt-2 space-y-2">
+                {activeTopic.resources.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No resources added yet.</p>
+                )}
+                {activeTopic.resources.map((r) => (
+                  <a
+                    key={r.id}
+                    href={r.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 rounded-xl border border-border bg-muted/50 p-3 text-sm transition-colors hover:bg-muted"
+                  >
+                    {r.type === "video" ? (
+                      <PlayCircle className="size-4 shrink-0 text-accent" />
+                    ) : (
+                      <FileText className="size-4 shrink-0 text-accent" />
+                    )}
+                    <span className="flex-1">{r.title}</span>
+                    <ExternalLink className="size-3.5 shrink-0 text-muted-foreground" />
+                  </a>
+                ))}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -86,12 +134,14 @@ function MilestoneCard({
   completed,
   interactive,
   onToggle,
+  onShowInfo,
 }: {
   node: TopicNode;
   side: "left" | "right";
   completed: Set<string>;
   interactive: boolean;
   onToggle: (id: string) => void;
+  onShowInfo: (node: TopicNode) => void;
 }) {
   const isDone = completed.has(node.id);
   const childCount = node.children?.length ?? 0;
@@ -106,62 +156,56 @@ function MilestoneCard({
           isDone ? "bg-moss" : "bg-accent",
         )}
       />
-      <button
-        type="button"
-        onClick={() => interactive && onToggle(node.id)}
-        disabled={!interactive}
+      <div
         className={cn(
           "group w-full rounded-2xl border border-border bg-card p-4 text-left shadow-sm transition-all hover:shadow-md",
           isDone && "border-moss/40 bg-moss/5",
-          interactive && "cursor-pointer",
         )}
       >
-        <div className="flex items-center gap-2" style={{ flexDirection: side === "left" ? "row-reverse" : "row" }}>
-          {interactive ? (
-            isDone ? (
-              <Check className="size-4 shrink-0 text-moss" />
-            ) : (
-              <Circle className="size-4 shrink-0 text-muted-foreground" />
-            )
-          ) : null}
-          <h3 className="font-heading text-lg font-semibold">{node.title}</h3>
+        <div
+          className="flex items-center gap-2"
+          style={{ flexDirection: side === "left" ? "row-reverse" : "row" }}
+        >
+          {interactive && (
+            <button
+              type="button"
+              onClick={() => onToggle(node.id)}
+              aria-label={isDone ? "Mark incomplete" : "Mark complete"}
+              className="shrink-0"
+            >
+              {isDone ? (
+                <Check className="size-4 text-moss" />
+              ) : (
+                <Circle className="size-4 text-muted-foreground" />
+              )}
+            </button>
+          )}
+          <h3 className="flex-1 font-heading text-lg font-semibold">{node.title}</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label={`Resources for ${node.title}`}
+            onClick={() => onShowInfo(node)}
+          >
+            <Info className="size-4 text-muted-foreground" />
+          </Button>
         </div>
         {node.description && (
           <p className="mt-1 text-sm text-muted-foreground">{node.description}</p>
         )}
 
-        {node.resources.length > 0 && (
-          <div className={cn("mt-2 flex flex-wrap gap-1.5", side === "left" && "justify-end")}>
-            {node.resources.map((r) => (
-              <a
-                key={r.id}
-                href={r.url}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground"
-              >
-                {r.title} <ExternalLink className="size-3" />
-              </a>
-            ))}
-          </div>
-        )}
-
         {childCount > 0 && (
-          <div className={cn("mt-3 flex flex-wrap gap-1.5", side === "left" && "justify-end")}>
+          <div className={cn("mt-3 flex flex-wrap items-center gap-1.5", side === "left" && "justify-end")}>
             {node.children!.map((c) => (
               <Badge
                 key={c.id}
                 variant="outline"
                 className={cn(
-                  "font-normal",
+                  "cursor-pointer font-normal",
                   completed.has(c.id) && "border-moss/40 bg-moss/10 text-moss",
-                  interactive && "cursor-pointer",
                 )}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (interactive) onToggle(c.id);
-                }}
+                onClick={() => (interactive ? onToggle(c.id) : onShowInfo(c))}
               >
                 {c.title}
               </Badge>
@@ -173,7 +217,7 @@ function MilestoneCard({
             )}
           </div>
         )}
-      </button>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db/client";
 import { subjects, topics, resources, progress } from "@/lib/db/schema";
 import { asc, eq } from "drizzle-orm";
+import { computeReadiness, type ReadinessBreakdown } from "@/lib/readiness";
 
 export async function listSubjects() {
   return db.query.subjects.findMany({ orderBy: asc(subjects.order) });
@@ -31,4 +32,31 @@ export async function getUserProgressForSubject(userId: string, topicIds: string
 
 export async function getAllProgressForUser(userId: string) {
   return db.query.progress.findMany({ where: eq(progress.userId, userId) });
+}
+
+export async function getReadinessBySubject(
+  userId: string,
+): Promise<Map<string, { total: number; done: number; readiness: ReadinessBreakdown }>> {
+  const [allSubjects, allTopics, userProgress] = await Promise.all([
+    db.query.subjects.findMany(),
+    db.query.topics.findMany(),
+    getAllProgressForUser(userId),
+  ]);
+
+  const completedTopicIds = new Set(userProgress.map((p) => p.topicId));
+
+  const result = new Map<string, { total: number; done: number; readiness: ReadinessBreakdown }>();
+  for (const s of allSubjects) {
+    const subjectTopics = allTopics.filter((t) => t.subjectId === s.id);
+    const topicIds = subjectTopics.map((t) => t.id);
+    const careerLevels = subjectTopics.map((t) => t.careerLevel);
+    const done = topicIds.filter((id) => completedTopicIds.has(id)).length;
+
+    result.set(s.id, {
+      total: topicIds.length,
+      done,
+      readiness: computeReadiness(careerLevels, completedTopicIds, topicIds),
+    });
+  }
+  return result;
 }

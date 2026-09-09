@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { Logo } from "@/components/logo";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 export async function SiteNav() {
@@ -12,6 +13,7 @@ export async function SiteNav() {
       <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
         <Logo />
         <nav className="flex items-center gap-3 text-sm font-medium">
+          <ThemeToggle />
           {session?.user?.role === "admin" && (
             <Link href="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
               Admin
