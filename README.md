@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Waypoint
 
-## Getting Started
+A learning-roadmap website: admins build tracks (Subjects → Milestones → Topics/Subtopics) like DevOps or Cloud Engineering, and learners create an account, follow the trail, and check off milestones as they complete them.
 
-First, run the development server:
+Built with Next.js App Router, TypeScript, Tailwind v4 + shadcn/ui, Drizzle ORM (SQLite locally, Turso in production), and Auth.js.
+
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env.local   # generates one AUTH_SECRET; edit values as needed
+npm run db:migrate
+npm run db:seed              # creates sample DevOps + Cloud Engineering tracks and an admin user
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Seed admin login defaults to `admin@roadmap.ai` / `ChangeMe123!` (override via `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env.local` before seeding).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Public site: http://localhost:3000
+- Admin: http://localhost:3000/admin/login
+- Learner signup: http://localhost:3000/signup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` / `npm run start` | Production build / serve |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run test` | Vitest unit tests |
+| `npm run test:e2e` | Playwright smoke tests |
+| `npm run db:generate` | Generate a Drizzle migration from `lib/db/schema.ts` |
+| `npm run db:migrate` | Apply migrations to the local SQLite file |
+| `npm run db:seed` | Seed sample tracks + admin user |
+| `npm run db:studio` | Open Drizzle Studio |
 
-To learn more about Next.js, take a look at the following resources:
+## Database: local vs. production
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`lib/db/client.ts` picks the driver based on env: if `TURSO_DATABASE_URL` is set it connects to Turso (libSQL), otherwise it opens a local SQLite file at `SQLITE_PATH` (default `sqlite.db`). Same schema, same queries — only the connection changes.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment (Phase 1)
 
-## Deploy on Vercel
+Deployed to Vercel via GitHub Actions:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `.github/workflows/ci.yml` — lint, typecheck, unit tests, build on every PR and push to `main`.
+- `.github/workflows/deploy.yml` — deploys to Vercel production on push to `main`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Required repo secrets: `VERCEL_TOKEN` (and a linked `.vercel/project.json`, or `VERCEL_ORG_ID`/`VERCEL_PROJECT_ID`). Required production env vars (set in Vercel): `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `AUTH_SECRET`.
+
+## Sub-agents (parallel dev workflow)
+
+`.claude/agents/` defines four single-purpose agents — `code-reviewer`, `linter`, `unit-tester`, `e2e-tester` — with no overlapping concerns, so they can run **in parallel** instead of one after another. Run `/pre-pr` before opening a pull request to fire all four at once against your current changes.
+
+## Phase 2 (later)
+
+Containerize with Docker, provision an EC2 instance with Terraform, and deploy via Docker Compose — see `PLAN.md`.
