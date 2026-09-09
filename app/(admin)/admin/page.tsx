@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Trash2, ArrowRight } from "lucide-react";
 
+// Admin-only, always-fresh data — never prerender at build time.
+export const dynamic = "force-dynamic";
+
 export default async function AdminPage() {
   const subjects = await listSubjects();
 

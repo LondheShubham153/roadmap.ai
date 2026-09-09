@@ -3,6 +3,10 @@ import { SiteNav } from "@/components/site-nav";
 import { listSubjects } from "@/lib/data";
 import { ArrowRight, MapPin } from "lucide-react";
 
+// Lists admin-managed subjects — always render fresh, never prerender at build time
+// (build environments, e.g. CI, may have no database available at all).
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const subjects = await listSubjects();
 

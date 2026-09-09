@@ -17,6 +17,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Admin-only, always-fresh data — never prerender at build time.
+export const dynamic = "force-dynamic";
+
 export default async function ManageSubjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const subject = await db.query.subjects.findFirst({ where: eq(subjects.id, id) });
