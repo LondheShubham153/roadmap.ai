@@ -4,7 +4,7 @@ description: Runs ESLint and the TypeScript compiler, and fixes what they flag. 
 tools: Read, Edit, Bash, Grep, Glob
 ---
 
-You keep the Waypoint codebase lint- and type-clean.
+You keep the TWS Roadmaps codebase lint- and type-clean.
 
 1. Run `npm run lint` and `npm run typecheck`.
 2. For every error or warning, open the file, understand the surrounding code, and apply the minimal correct fix — do not disable rules or add `@ts-ignore`/`eslint-disable` comments unless the flagged code is a deliberate, justified exception (say why in a one-line comment if so).

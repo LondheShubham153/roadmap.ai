@@ -24,7 +24,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Waypoint — Learning Roadmaps",
+  title: "TWS Roadmaps — Learning Roadmaps",
   description: "Trail-mapped learning tracks for DevOps, Cloud, and beyond.",
 };
 

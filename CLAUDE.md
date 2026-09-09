@@ -62,6 +62,6 @@ Readiness math lives in `lib/readiness.ts` (`computeReadiness`) — pure and uni
 
 ## Known issues / in-progress (Phase 2)
 
-- Fixing the `/admin/login` redirect-loop bug (see `proxy.ts` gotcha above).
-- Rebranding "Waypoint" → "TWS Roadmaps" across `app/layout.tsx`, `components/logo.tsx`, `app/(public)/page.tsx`, README, and the `.claude/agents/*.md` descriptions that mention the old name.
-- AWS deployment plan (Docker + Terraform + EC2 + Docker Compose) — planning only for now, not executing.
+- `/admin/login` redirect-loop bug — **fixed** in `proxy.ts` (see gotcha above).
+- Rebranding "Waypoint" → "TWS Roadmaps" — **done** across `app/layout.tsx`, `components/logo.tsx`, `app/(public)/page.tsx`, README, `.claude/agents/*.md`. `package.json`'s internal `name` field and the seed admin email were left as `roadmap-ai`/`roadmap.ai` intentionally — internal identifiers, not user-facing branding.
+- AWS deployment plan written at `docs/AWS_DEPLOYMENT_PLAN.md` (Docker + Terraform + EC2 + Docker Compose, Turso stays the DB) — **planning only, not implemented**. Has open questions (domain, region, instance size) to resolve with the user before building it.

@@ -12,7 +12,7 @@ export function Logo({ className }: { className?: string }) {
         <circle cx="16" cy="14" r="2.2" className="fill-background" />
       </svg>
       <span className="font-heading text-xl font-semibold tracking-tight">
-        Waypoint
+        TWS Roadmaps
       </span>
     </Link>
   );

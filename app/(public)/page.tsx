@@ -18,7 +18,7 @@ export default async function HomePage() {
             Learning, mapped like a trail.
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
-            Waypoint turns DevOps, Cloud, and other technical journeys into a
+            TWS Roadmaps turns DevOps, Cloud, and other technical journeys into a
             walkable roadmap — pick a track, follow the trail, and mark every
             milestone as you clear it.
           </p>
