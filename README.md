@@ -39,14 +39,16 @@ Seed admin login defaults to `admin@roadmap.ai` / `ChangeMe123!` (override via `
 
 `lib/db/client.ts` picks the driver based on env: if `TURSO_DATABASE_URL` is set it connects to Turso (libSQL), otherwise it opens a local SQLite file at `SQLITE_PATH` (default `sqlite.db`). Same schema, same queries — only the connection changes.
 
-## Deployment (Phase 1)
+## Deployment
 
-Deployed to Vercel via GitHub Actions:
+- **Live**: https://roadmap-ai-neon.vercel.app
+- **Database**: Turso (libSQL), project `roadmap-ai` — migrated and seeded with the sample tracks + an admin account.
+- **Repo**: https://github.com/LondheShubham153/roadmap.ai
+- **CI**: GitHub Actions runs on every PR/push to `main`:
+  - `.github/workflows/lint.yml` — ESLint + `tsc --noEmit`
+  - `.github/workflows/ci.yml` — Vitest unit tests + production build
 
-- `.github/workflows/ci.yml` — lint, typecheck, unit tests, build on every PR and push to `main`.
-- `.github/workflows/deploy.yml` — deploys to Vercel production on push to `main`.
-
-Required repo secrets: `VERCEL_TOKEN` (and a linked `.vercel/project.json`, or `VERCEL_ORG_ID`/`VERCEL_PROJECT_ID`). Required production env vars (set in Vercel): `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `AUTH_SECRET`.
+Deploys are handled by Vercel's native GitHub integration (connect it once in the Vercel dashboard — Project Settings → Git — and every push to `main` deploys automatically). Production env vars (`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `AUTH_SECRET`) are already set on the Vercel project.
 
 ## Sub-agents (parallel dev workflow)
 
