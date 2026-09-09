@@ -3,6 +3,10 @@ import { SiteNav } from "@/components/site-nav";
 import { listSubjects } from "@/lib/data";
 import { ArrowRight, MapPin } from "lucide-react";
 
+// Lists admin-managed subjects — always render fresh, never prerender at build time
+// (build environments, e.g. CI, may have no database available at all).
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const subjects = await listSubjects();
 
@@ -18,7 +22,7 @@ export default async function HomePage() {
             Learning, mapped like a trail.
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
-            Waypoint turns DevOps, Cloud, and other technical journeys into a
+            TWS Roadmaps turns DevOps, Cloud, and other technical journeys into a
             walkable roadmap — pick a track, follow the trail, and mark every
             milestone as you clear it.
           </p>

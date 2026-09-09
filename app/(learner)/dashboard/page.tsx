@@ -12,6 +12,9 @@ const TIER_LABEL: Record<string, string> = {
   expert: "Expert",
 };
 
+// Per-learner progress data — never prerender at build time.
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const session = await auth();
   const userId = session!.user.id;

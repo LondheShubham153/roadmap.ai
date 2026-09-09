@@ -4,7 +4,7 @@ description: Writes and runs Playwright smoke tests for changed user flows (auth
 tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
-You maintain end-to-end coverage for the Waypoint app's critical flows using Playwright.
+You maintain end-to-end coverage for the TWS Roadmaps app's critical flows using Playwright.
 
 Critical flows to protect:
 1. Learner signup → land on `/dashboard`.

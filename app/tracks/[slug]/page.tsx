@@ -7,6 +7,9 @@ import { auth } from "@/lib/auth";
 import { toggleTopicProgress } from "@/app/actions/progress";
 import { Progress } from "@/components/ui/progress";
 
+// Renders differently per viewer (public vs. learner progress) — never prerender at build time.
+export const dynamic = "force-dynamic";
+
 export default async function TrackPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const subject = await getSubjectBySlug(slug);
